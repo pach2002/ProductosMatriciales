@@ -19,45 +19,45 @@ section .data
     SYS_close equ 3 ; Close File
     SYS_creat equ 85 ; Open/Create File
 
-    mensaje db "La Distancia Eucliadana es la Raiz de: ", 0 ; mensaje inicial
-    valorRDX db 0 ; espacio para almacenar el valor de rdx como cadena de caracteres
-    LF_DB db LF, 0 ; salto de línea y carácter nulo
+    message db "La Distancia Eucliadana es la Raiz de: ", 0 ; init message
+    RDXvalue db 0 ; storage for rdx value like a string
+    LF_DB db LF, 0 ; end of line and null
 
 section .text
 global _start
     _start:
 
-    mov rdi, 2 ;x1
-    mov rsi, 5 ;y1
+    mov rdi, 3 ;x1
+    mov rsi, 6 ;y1
     mov rdx, 10 ;x2
-    mov rcx, 8 ;y2
+    mov rcx, 5 ;y2
 
     call EuclideanDistance ; Call function
 
-    ; Convertir el valor de rdx a cadena de caracteres
+    ; Convert rdx value in chars
     mov rax, rdx
-    mov rbx, 10 ; base decimal
-    xor rcx, rcx ; contador de dígitos
+    mov rbx, 10 ; decimal
+    xor rcx, rcx ; counter
     convertLoop:
         xor rdx, rdx
         div rbx
-        add dl, '0' ; convertir dígito a ASCII
+        add dl, '0' ; turns to ASCII
         dec rcx
-        mov byte [valorRDX + rcx], dl ; almacenar dígito en valorRDX
+        mov byte [RDXvalue + rcx], dl ; Store value in variable
         test rax, rax
         jnz convertLoop
 
-    ; Añadir el valor de rdx al mensaje
-    mov rdi, mensaje
-    mov rsi, valorRDX
+    ; Add rdx value in message
+    mov rdi, message
+    mov rsi, RDXvalue
     call appendString
 
-    ; Añadir salto de línea al mensaje
-    mov rdi, mensaje
+    ; add End Line to message
+    mov rdi, message
     mov rsi, LF_DB
     call appendString
 
-    mov rdi, mensaje
+    mov rdi, message
     call printString       ; If it was correct, print it
     jmp last               ; end code
 
