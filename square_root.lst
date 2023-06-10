@@ -1,0 +1,37 @@
+     1                                 %line 1+1 square_root.asm
+     2                                 [section .data]
+     3 00000000 25640A00                format db "%d", 10, 0
+     4                                 
+     5                                 [section .text]
+     6                                 [global _start]
+     7                                 
+     8                                 _start:
+     9 00000000 D90425[00000000]        fld dword [dividend]
+    10 00000007 D83425[00000000]        fdiv dword [divisor]
+    11                                 
+    12                                 
+    13 0000000E 83EC04                  sub esp, 4
+    14 00000011 67D91C24                fstp dword [esp]
+    15                                 
+    16                                 
+    17 00000015 67DB0424                fild dword [esp]
+    18                                 
+    19                                 
+    20 00000019 890425[00000000]        mov dword [resultado], eax
+    21                                 
+    22                                 
+    23 00000020 B804000000              mov eax, 4
+    24 00000025 BB01000000              mov ebx, 1
+    25 0000002A B9[00000000]            mov ecx, resultado
+    26 0000002F BA04000000              mov edx, 4
+    27 00000034 CD80                    int 0x80
+    28                                 
+    29                                 
+    30 00000036 B801000000              mov eax, 1
+    31 0000003B 31DB                    xor ebx, ebx
+    32 0000003D CD80                    int 0x80
+    33                                 
+    34                                 [section .data]
+    35 00000004 00002041                dividend dd 10.0
+    36 00000008 00004040                divisor dd 3.0
+    37 0000000C 00000000                resultado dd 0
