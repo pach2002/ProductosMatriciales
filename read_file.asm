@@ -1,5 +1,7 @@
 ; --------------------------------
 ; Create a function to read a file and print it
+
+; rdi is register to bring message to print
 section .data
 
 ;----------
@@ -40,8 +42,8 @@ section .data
     ; --------
     ; Name for file and content
     newline  db LF, NULL
-    Header db LF, "Ejemplo de archivo de escritura", LF, LF, NULL
-    Filename db "PruebaWrite.txt", NULL
+    Header db LF, "Intentamos leer la matriz", LF, LF, NULL
+    Filename db "matriz.txt", NULL
     WWWAD db "https://www.google.com"
             db LF, LF, NULL
     Len dq $-WWWAD - 1
@@ -64,54 +66,7 @@ section .text
     ; --------------
     ; Try to Open file using system service
     OpenInputFile:
-        mov rax, SYS_creat ; Open or Create
-        mov rdi, Filename
-        mov rsi, S_IRUSR | S_IWUSR | S_IXUSR
-        syscall
 
-        cmp ax, 0
-        jl ErrorOpen
-
-        mov qword [fileDesc], rax
-        mov rdi, Exito
-        call printString
-        
-        ;-------------------------
-        ;Write message into the opened file 
-        ;Using system service
-
-        
-        mov rax, SYS_write
-        mov rdi, qword[fileDesc]
-        mov rsi, WWWAD
-        mov rdx, qword[Len]
-        syscall
-        
-        cmp rax, 0         ;if error -> rax < 0
-
-
-        jl ErrorWrite
-
-        mov rdi, WriteDone ; if success -> rax = count of characters actually
-        call printString   ; mov exit message and print it
-        ;--------------------------
-        ;Close file if was succesfull writed
-        mov rax, SYS_close
-        mov rdi, qword [fileDesc]
-        syscall
-
-
-        jmp last
-
-    ErrorOpen:
-        mov rdi, ErrorMSG
-        call printString
-        jmp last
-
-    ErrorWrite:
-        mov rdi, ErrorMSG1
-        call printString
-        jmp last
 
 ;Fin del programa
 last:

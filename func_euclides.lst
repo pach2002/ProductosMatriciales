@@ -1,0 +1,130 @@
+     1                                 %line 1+1 func_euclides.asm
+     2                                 
+     3                                 
+     4                                 
+     5                                 
+     6                                 
+     7                                 [section .data]
+     8                                 
+     9                                 
+    10                                  EXIT_SUCCESS equ 0
+    11                                  SYS_EXIT equ 60
+    12                                 
+    13                                 
+    14                                 
+    15                                  LF equ 10
+    16                                  NULL equ 0
+    17                                 
+    18                                  STDIN equ 0
+    19                                  STDOUT equ 1
+    20                                  STDERR equ 2
+    21                                 
+    22                                  SYS_read equ 0
+    23                                  SYS_write equ 1
+    24                                  SYS_close equ 3
+    25                                  SYS_creat equ 85
+    26                                 
+    27                                 [section .text]
+    28                                 [global _start]
+    29                                  _start:
+    30                                 
+    31 00000000 48C7C703000000          mov rdi, 3
+    32 00000007 48C7C603000000          mov rsi, 3
+    33 0000000E 48C7C203000000          mov rdx, 3
+    34 00000015 48C7C105000000          mov rcx, 5
+    35                                 
+    36 0000001C E812000000              call EuclideanDistance
+    37 00000021 E847000000              call printString
+    38 00000026 EBFE                    jmp last
+    39                                 
+    40                                  last:
+    41                                 
+    42 00000028 48C7C03C000000          mov rax, SYS_EXIT
+    43 0000002F 48C7C700000000          mov rdi, EXIT_SUCCESS
+    44 00000036 0F05                    syscall
+    45                                 
+    46                                 
+    47                                 [global EuclideanDistance]
+    48                                 EuclideanDistance:
+    49                                 
+    50 00000038 53                      push rbx
+    51                                 
+    52                                 
+    53                                 
+    54                                 
+    55                                 
+    56 00000039 4829FA                  sub rdx, rdi
+    57                                 
+    58                                 
+    59 0000003C 4829F1                  sub rcx, rsi
+    60                                 
+    61                                 
+    62                                 
+    63 0000003F 4831C0                  xor rax, rax
+    64                                 
+    65 00000042 4889D0                  mov rax, rdx
+    66 00000045 48F7E2                  mul rdx
+    67 00000048 4831D2                  xor rdx, rdx
+    68 0000004B 4889C2                  mov rdx, rax
+    69                                 
+    70                                 
+    71 0000004E 4831C0                  xor rax, rax
+    72                                 
+    73 00000051 4889C8                  mov rax, rcx
+    74 00000054 48F7E1                  mul rcx
+    75 00000057 4831C9                  xor rcx, rcx
+    76 0000005A 4889C1                  mov rcx, rax
+    77                                 
+    78                                 
+    79 0000005D 4801CA                  add rdx, rcx
+    80 00000060 EBFE                    jmp Next
+    81                                 
+    82                                  Next:
+    83                                 
+    84 00000062 4831C0                  xor rax, rax
+    85                                 
+    86 00000065 4889D0                  mov rax, rdx
+    87 00000068 48F7F2                  div rdx
+    88                                 
+    89 0000006B 4889C7                  mov rdi, rax
+    90 0000006E EBFE                    jmp endProcess
+    91                                 
+    92                                 
+    93                                 
+    94                                  endProcess:
+    95 00000070 5B                      pop rbx
+    96 00000071 C3                      ret
+    97                                 
+    98                                 
+    99                                 [global printString]
+   100                                 printString:
+   101                                 
+   102 00000072 53                      push rbx
+   103                                 
+   104                                 
+   105 00000073 4889FB                  mov rbx, rdi
+   106 00000076 48C7C200000000          mov rdx, 0
+   107                                  countStrLoop:
+   108 0000007D 803B00                  cmp byte [rbx], NULL
+   109 00000080 7406                    je countStrDone
+   110 00000082 48FFC2                  inc rdx
+   111 00000085 48FFC3                  inc rbx
+   112 00000088 EBF1                    jmp countStrLoop
+   113                                 
+   114                                  countStrDone:
+   115 0000008A 4883FA00                cmp rdx, 0
+   116 0000008E 7411                    je prtDone
+   117                                 
+   118                                 
+   119 00000090 48C7C001000000          mov rax, SYS_write
+   120 00000097 4889FE                  mov rsi, rdi
+   121 0000009A 48C7C701000000          mov rdi, STDOUT
+   122                                 
+   123 000000A1 0F05                    syscall
+   124                                 
+   125                                 
+   126                                 
+   127                                  prtDone:
+   128 000000A3 5B                      pop rbx
+   129 000000A4 C3                      ret
+   130                                 
