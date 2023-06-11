@@ -27,10 +27,10 @@ section .text
 global _start
     _start:
 
-    mov rdi, 3 ;x1
-    mov rsi, 6 ;y1
+    mov rdi, 5 ;x1
+    mov rsi, 3 ;y1
     mov rdx, 10 ;x2
-    mov rcx, 5 ;y2
+    mov rcx, 2 ;y2
 
     call EuclideanDistance ; Call function
 

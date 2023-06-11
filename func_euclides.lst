@@ -32,10 +32,10 @@
     32                                 [global _start]
     33                                  _start:
     34                                 
-    35 00000000 48C7C703000000          mov rdi, 3
-    36 00000007 48C7C606000000          mov rsi, 6
+    35 00000000 48C7C705000000          mov rdi, 5
+    36 00000007 48C7C603000000          mov rsi, 3
     37 0000000E 48C7C20A000000          mov rdx, 10
-    38 00000015 48C7C105000000          mov rcx, 5
+    38 00000015 48C7C102000000          mov rcx, 2
     39                                 
     40 0000001C E863000000              call EuclideanDistance
     41                                 
