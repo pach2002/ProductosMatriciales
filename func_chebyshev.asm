@@ -21,7 +21,7 @@ section .data
     SYS_close equ 3 ; Close File
     SYS_creat equ 85 ; Open/Create File
 
-    message db "La Distancia Manhattan es de: ", 0 ; init message
+    message db "La Distancia Chebyshev es de: ", 0 ; init message
     RDXvalue db 0 ; storage for rdx value like a string
     LF_DB db LF, 0 ; end of line and null
 
@@ -34,7 +34,7 @@ global _start
     mov rdx, 3 ;x2
     mov rcx, 2 ;y2
 
-    call ManhattanDistance ; Call function
+    call ChebyshevDistance ; Call function
 
     ; Convert rdx value in chars
     mov rax, rdx
@@ -70,10 +70,10 @@ global _start
         syscall
 ;_______________________________________________________________________
 ; Function to Calculate Manhattan Distance
-; input:  Manhattan (X1, Y1, X2, Y2) using rdi, rsi, rdx, rcx
+; input:  Chebyshev (X1, Y1, X2, Y2) using rdi, rsi, rdx, rcx
 ; output: RDX WITH FINAL VALUE
-global  ManhattanDistance
-ManhattanDistance:
+global ChebyshevDistance
+ChebyshevDistance:
     ; Epilogue
     push rbx
 
@@ -106,15 +106,28 @@ ManhattanDistance:
 
     ;___ If values are positive now, continue
 
-    add rdi, rsi    ; |x1-x2|+|y1-y2|
-    mov rdx, rdi    ; mov to rdx, cause this is the return value
-    jmp endProcess
-        
+    ; Compare two values and what are the highest
+    ; MAX (|x1-x2|, |y1-y2|)
+
+    cmp rdi, rsi    ; if rdi >= rsi
+    jge MaxX 
+
+    cmp rdi, rsi    ; if rdi <= rsi
+    jle MaxY
+
     ; ------------------------
     ; Prologue
     endProcess:
         pop rbx
         ret
+
+    MaxX:
+        mov rdx, rdi    ; mov rdi to rdx, cause X is the highest
+        jmp endProcess  ; end program
+
+    MaxY:
+        mov rdx, rsi    ; mov rsi to rdx, cause Y is the highest
+        jmp endProcess  ; end program
     ; ++++++++++++++++++++++++
 
 ;___________________________________________________________
