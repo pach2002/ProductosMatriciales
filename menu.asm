@@ -136,20 +136,69 @@ section .text
         mov rdi, input_size  ; insert size of matrix
         call inputValue
 
+        ; convert ASCII value to integer
+        sub byte [input_size], '0'
+
+        movzx r8, byte[input_size] ; Store value in registers to next functions (r8 for size)
+
+        jmp next
+
+        next:
         ; insert coordinates
-        mov rdi, coordinatesMessage ; message to solitude coordinates
+        mov rdi, coordinatesMessage ; message to request coordinates
         call printString
 
             ; x1
-            ; TODO:
-        
+            mov rdi, x1Message      ; message to request x1
+            call printString
+
+            mov rdi, input_x1
+            call inputValue
+
+            ; y1
+            mov rdi, y1Message      ; message to request y1
+            call printString
+
+            mov rdi, input_y1 
+            call inputValue
+
+            ; x2 
+            mov rdi, x2Message       ; message to request x2
+            call printString
+
+            mov rdi, input_x2
+            call inputValue
+
+            ; y2
+            mov rdi, y2Message      ; message to request y2
+            call printString
+
+            mov rdi, input_y2
+            call inputValue
+
+            ;___ convert ASCII values to integer
+            sub byte [input_x1], '0'
+            sub byte [input_y1], '0'
+            sub byte [input_x2], '0'
+            sub byte [input_y2], '0'
+
+            ;___ Store values in registers to next functions
+            ;___ (rdi, rsi) (rdx, rcx) and jump to another function
+
+            movzx rdi, byte[input_x1]
+            movzx rsi, byte[input_y1]
+            movzx rdx, byte[input_x2]
+            movzx rcx, byte[input_y2]
+            
+
+            jmp last   ; TEMPORALLY
 
 
    ; option 1
 create:
     mov rdi, createMessage  ; print create option
     call printString
-    jmp last        ; mov to tag insertValues
+    jmp insertValues        ; mov to tag insertValues
 
 ; option 2
 read:
@@ -234,7 +283,7 @@ inputValue:
     mov rax, SYS_read       ; System call number for read
     mov rsi, rdi            ; Memory address to store the first input value
     mov rdi, STDIN          ; File descriptor for standard input
-    mov rdx, 1              ; Maximum number of bytes to read
+    mov rdx, 2              ; Maximum number of bytes to read
     syscall
 
     jmp readDone
