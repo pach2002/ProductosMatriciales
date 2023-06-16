@@ -24,14 +24,9 @@ section .data
     LF_DB db LF, 0 ; end of line and null
 
 section .text
-global _start
-    _start:
-
-    mov rdi, 7 ;x1
-    mov rsi, 5 ;y1
-    mov rdx, 3 ;x2
-    mov rcx, 2 ;y2
-
+global euclides
+    euclides:
+    
     call EuclideanDistance ; Call function
 
     ; Convert rdx value in chars
@@ -50,22 +45,26 @@ global _start
     ; Add rdx value in message
     mov rdi, message
     mov rsi, RDXvalue
-    call appendString
+    call appendStringE
 
     ; add End Line to message
-    mov rdi, message
-    mov rsi, LF_DB
-    call appendString
+    ; mov rdi, message
+    ; mov rsi, LF_DB
+    ; call appendStringE
 
     mov rdi, message
-    call printString       ; If it was correct, print it
-    jmp last               ; end code
+    call printStringE       ; If it was correct, print it
 
-    last:
+    mov rdi, LF_DB
+    call printStringE       ; print END OF THE LINE
+
+    ; jmp last               ; end code
+
+    ; last:
     ; Exit
-        mov rax, SYS_EXIT
-        mov rdi, EXIT_SUCCESS
-        syscall
+       ; mov rax, SYS_EXIT
+       ; mov rdi, EXIT_SUCCESS
+       ; syscall
 ;_______________________________________________________________________
 ; Function to Calculate Euclidean Distance (Before Final Square Root)
 ; input: euclidean (X1, Y1, X2, Y2) using rdi, rsi, rdx, rcx
@@ -99,9 +98,6 @@ EuclideanDistance:
     mul rcx
     mov rcx, rax    ; we have two squares
 
-    jmp next
-
-    next:
     ;_______ add rdx to rcx [(x2-x1)2 + (y2-y1)2]
     add rbx, rcx    
     mov rdx, rbx ; rdx is the final value
@@ -117,8 +113,8 @@ EuclideanDistance:
 ;___________________________________________________________
 ; Function to print a standar output
 ; input: rdi - value to display
-global printString
-printString:
+global printStringE
+printStringE:
     ; Epilogo
     push rbx
 
@@ -153,8 +149,8 @@ printString:
 
 ; Function to append a string to the end of another string
 ; input: rdi - destination string, rsi - source string
-global appendString
-appendString:
+global appendStringE
+appendStringE:
     ; Epilogue
     push rbx
 

@@ -9,6 +9,14 @@
 
 section .data
 
+;_______________________________
+; extern functions
+extern euclides  ; euclides function
+extern manhatan  ; manhatan function
+extern chebyshov ; chebyshov function
+extern generateMatrix ; generateMatrix function
+extern readMatrix     ; readMatrix function
+
 ; ______________________________
 ;Definition of constant values
 
@@ -53,13 +61,16 @@ section .data
 
 ; Definition of messages and utilities
 
-exitMessage db "you choose exit program, bye!", LF, NULL
+exitMessage db " you choose exit program, bye!", LF, NULL
 errorMessage db "create or read a matrix before pls", LF, NULL
 chebyshevMessage db "you choose chebyshev distance", LF, NULL
 manhattanMessage db "you choose manhattan distance", LF, NULL
 euclideanMessage db "you choose euclidean distance", LF, NULL
 createMessage db "you choose create your own Matrix", LF, NULL
 readMessage db "you choose read a Matrix from a file", LF, NULL
+invalidMessage db "INVALID DATA, TRY AGAIN", LF, NULL
+notZeroMessage db "ERROR: NOT ZERO ALLOWED", LF, NULL
+notDataMessage db "Introduce data to calculate distance", LF, NULL
 
 ; messages to values for 1st option
 sizeMessage db "insert size of new matrix", LF, NULL
@@ -122,6 +133,14 @@ section .text
     cmp rax, 54
     je exit
 
+    ; if it is another option, mov to invalid tag
+    cmp rax, 54
+    jg invalidData
+
+    ; if it is 0, not allow insert 0.
+    cmp rax, 48
+    je notZero
+
     ;________________________________________
     ; if you choose create a new matrix:
     ; input a) size of matrix (r8 register)
@@ -136,14 +155,19 @@ section .text
         mov rdi, input_size  ; insert size of matrix
         call inputValue
 
+        ; el valor recibido dentro de la variable si entra como se solicita
+        ; si le mandamos un 10, se guarda 49 y 48 (1 y 0 en ASCII)
+        ; ¿Como convertimos ese 1 y 0 en decimal?
+
         ; convert ASCII value to integer
         sub byte [input_size], '0'
 
+        ; before move data, compare if it isn't 0, cause you cannot create a new matrix with 0 size
+        cmp byte[input_size], 0
+        je notZero                 ; if equals 0, display error
+
         movzx r8, byte[input_size] ; Store value in registers to next functions (r8 for size)
 
-        jmp next
-
-        next:
         ; insert coordinates
         mov rdi, coordinatesMessage ; message to request coordinates
         call printString
@@ -176,6 +200,7 @@ section .text
             mov rdi, input_y2
             call inputValue
 
+
             ;___ convert ASCII values to integer
             sub byte [input_x1], '0'
             sub byte [input_y1], '0'
@@ -189,12 +214,20 @@ section .text
             movzx rsi, byte[input_y1]
             movzx rdx, byte[input_x2]
             movzx rcx, byte[input_y2]
+
+            ; STORE REGISTERS (COORDINATES) IN STACK
+            push rdi
+            push rsi
+            push rdx
+            push rcx
+
+            ; now, values in registers are available to create matrix
+            call generateMatrix
             
+            jmp _start   ; print menu again
 
-            jmp last   ; TEMPORALLY
 
-
-   ; option 1
+; option 1
 create:
     mov rdi, createMessage  ; print create option
     call printString
@@ -204,31 +237,137 @@ create:
 read:
     mov rdi, readMessage    ; print read option
     call printString
-    jmp last
+    
+    call readMatrix         ; read file "MatrizGenerada.txt"
+
+    jmp _start
+
+    ;_____________________________________________________________
+    ; if user choose a calculus, check if coordinates exist
+    ; if x1 != 0 : ir al calculo
+    ; else : imprimir el menú
 
 ; option 3
 euclidean:
+
     mov rdi, euclideanMessage ; print option message
     call printString
-    jmp last
+
+    ; CLEAN REGISTER
+    ;xor rax, rax
+    ;xor rbx, rbx
+
+    ; RESTORE VALUES
+    pop rcx
+    pop rdx
+    pop rsi
+    pop rdi
+
+    call euclides              ; call extern function
+
+    movzx rdi, byte[input_x1]
+    movzx rsi, byte[input_y1]
+    movzx rdx, byte[input_x2]
+    movzx rcx, byte[input_y2]
+
+    ; STORE REGISTERS (COORDINATES) IN STACK
+    push rdi
+    push rsi
+    push rdx
+    push rcx
+
+    jmp _start                 ; return to menu
 
 ; option 4
 manhattan:
+
     mov rdi, manhattanMessage ; print option message
     call printString
-    jmp last
+
+    ; CLEAN REGISTER
+    ;xor rax, rax
+    ;xor rbx, rbx
+
+    ; RESTORE VALUES
+    pop rcx
+    pop rdx
+    pop rsi
+    pop rdi
+
+    call manhatan              ; call extern function
+
+    movzx rdi, byte[input_x1]
+    movzx rsi, byte[input_y1]
+    movzx rdx, byte[input_x2]
+    movzx rcx, byte[input_y2]
+
+    ; STORE REGISTERS (COORDINATES) IN STACK
+    push rdi
+    push rsi
+    push rdx
+    push rcx
+
+    jmp _start                 ; return to menu
+
 
 ; option 5
 chebyshev:
+    
     mov rdi, chebyshevMessage ; print option message
     call printString
-    jmp last
+
+    ; CLEAN REGISTER
+    ; xor rax, rax
+    ; xor rbx, rbx
+
+    ; RESTORE VALUES
+    pop rcx
+    pop rdx
+    pop rsi
+    pop rdi
+
+    jmp next
+
+    next:
+    call chebyshov              ; call extern function
+
+    jmp next1
+
+    next1:
+    movzx rdi, byte[input_x1]
+    movzx rsi, byte[input_y1]
+    movzx rdx, byte[input_x2]
+    movzx rcx, byte[input_y2]
+
+    ; STORE REGISTERS (COORDINATES) IN STACK
+    push rdi
+    push rsi
+    push rdx
+    push rcx
+
+    jmp _start                 ; return to menu
+
 
 ; option 6
 exit:
     mov rdi, exitMessage ; print exit message
     call printString
     jmp last
+
+invalidData:
+    mov rdi, invalidMessage ; print "invalid data" message
+    call printString
+    jmp _start              ; start again, printing menu
+
+notZero:
+    mov rdi, notZeroMessage ; print error if value is 0
+    call printString
+    jmp last
+
+notData:
+    mov rdi, notDataMessage  ; print if program don´t have coordinates
+    call printString
+    jmp _start               ; return to menu
 
 last:
     mov rax, SYS_EXIT
@@ -272,7 +411,8 @@ printString:
     ; ++++++++++++++++++++++++
 
 ;___________________________________________________________
-; Function to READ a standar INPUT (1 BYTE MAX INPUT)
+; Function to READ a standar INPUT (3 BYTE MAX INPUT)
+; (2 BYTES FOR VALUES AND 1 BYTE FOR END LINE)
 ; input: rdi - address to store characters
 global inputValue
 inputValue:
@@ -283,8 +423,11 @@ inputValue:
     mov rax, SYS_read       ; System call number for read
     mov rsi, rdi            ; Memory address to store the first input value
     mov rdi, STDIN          ; File descriptor for standard input
-    mov rdx, 2              ; Maximum number of bytes to read
+    mov rdx, 3              ; Maximum number of bytes to read
     syscall
+
+    ;; Debe haber alguna forma de leer el tamaño de bytes a insertar
+
 
     jmp readDone
 
