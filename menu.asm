@@ -16,6 +16,7 @@ extern manhatan  ; manhatan function
 extern chebyshov ; chebyshov function
 extern generateMatrix ; generateMatrix function
 extern readMatrix     ; readMatrix function
+extern readData       ; readData function
 
 ; ______________________________
 ;Definition of constant values
@@ -67,6 +68,7 @@ chebyshevMessage db "you choose chebyshev distance", LF, NULL
 manhattanMessage db "you choose manhattan distance", LF, NULL
 euclideanMessage db "you choose euclidean distance", LF, NULL
 createMessage db "you choose create your own Matrix", LF, NULL
+printMessage db "you choose print a Matrix from a file", LF, NULL
 readMessage db "you choose read a Matrix from a file", LF, NULL
 invalidMessage db "INVALID DATA, TRY AGAIN", LF, NULL
 notZeroMessage db "ERROR: NOT ZERO ALLOWED", LF, NULL
@@ -82,11 +84,12 @@ y2Message db "Y2:", LF, NULL
 ; ADD MORE ...
 
 menuOptions db "[1] create matrix", LF, NULL
-           db "[2] read matrix", LF, NULL
-           db "[3] calculate euclidean distance", LF, NULL
-           db "[4] calculate manhattan distance", LF, NULL
-           db "[5] calculate chebyshev distance", LF, NULL
-           db "[6] exit", LF, NULL
+           db "[2] print matrix", LF, NULL
+           db "[3] read matrix", LF, NULL
+           db "[4] calculate euclidean distance", LF, NULL
+           db "[5] calculate manhattan distance", LF, NULL
+           db "[6] calculate chebyshev distance", LF, NULL
+           db "[7] exit", LF, NULL
 
 menuSize equ $ - menuOptions   ; Calculate the length of menuOptions
 
@@ -117,20 +120,24 @@ section .text
     cmp rax, 50
     je read
 
-    ; if it is 3 move to euclidean tag
+    ; if it is 3 move to exit tag
     cmp rax, 51
+    je readValue
+
+    ; if it is 4 move to euclidean tag
+    cmp rax, 52
     je euclidean
 
-    ; if it is 4 move to manhattan tag
-    cmp rax, 52
+    ; if it is 5 move to manhattan tag
+    cmp rax, 53
     je manhattan
 
-    ; if it is 5 move to chebyshev tag
-    cmp rax, 53
+    ; if it is 6 move to chebyshev tag
+    cmp rax, 54
     je chebyshev
 
-    ; if it is 6 move to exit tag
-    cmp rax, 54
+    ; if it is 7 move to exit tag
+    cmp rax, 55
     je exit
 
     ; if it is another option, mov to invalid tag
@@ -235,7 +242,7 @@ create:
 
 ; option 2
 read:
-    mov rdi, readMessage    ; print read option
+    mov rdi, printMessage    ; print print option
     call printString
     
     call readMatrix         ; read file "MatrizGenerada.txt"
@@ -246,6 +253,38 @@ read:
     ; if user choose a calculus, check if coordinates exist
     ; if x1 != 0 : ir al calculo
     ; else : imprimir el menú
+
+
+; NEW OPTION, ACTUALLY THIS IS OPTION 3
+
+readValue:
+
+    mov rdi, readMessage    ; print print option
+    call printString
+    
+    call readData
+
+    ; STORE REGISTERS (COORDINATES) IN STACK
+    push rdi
+    push rsi
+    push rdx
+    push rcx
+    
+    ; SAVE REGISTER INTO LOCAL VARIABLES
+    ; Mueve el contenido del registro RDI a la variable input_x1
+    mov byte[input_x1], dil
+
+    ; Mueve el contenido del registro RSI a la variable input_y1
+    mov byte[input_y1], sil
+
+    ; Mueve el contenido del registro RDX a la variable input_x2
+    mov byte[input_x2], dl
+
+    ; Mueve el contenido del registro RCX a la variable input_y2
+    mov byte[input_y2], cl
+
+
+    jmp _start
 
 ; option 3
 euclidean:
